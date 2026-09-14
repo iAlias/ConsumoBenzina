@@ -165,6 +165,8 @@ versioni.
 
 ## Demo su GitHub Pages
 
+**<https://ialias.github.io/ConsumoBenzina/>**
+
 Il branch `main` viene pubblicato automaticamente su GitHub Pages a ogni push
 (workflow in `.github/workflows/deploy-pages.yml`), nella variante senza PHP:
 i dati restano nel browser di chi apre la pagina (vedi sopra "Versione per
