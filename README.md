@@ -1,13 +1,60 @@
-# Consumo Benzina
+# ⛽ Consumo Benzina
 
-Applicazione per monitorare i consumi e le spese di carburante dell'auto.
+[![Pubblica su GitHub Pages](https://github.com/iAlias/ConsumoBenzina/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/iAlias/ConsumoBenzina/actions/workflows/deploy-pages.yml)
+[![Licenza MIT](https://img.shields.io/github/license/iAlias/ConsumoBenzina)](LICENSE)
+[![Node.js >= 18](https://img.shields.io/badge/node-%3E%3D18-339933?logo=node.js&logoColor=white)](package.json)
+
+Applicazione web per monitorare i consumi e le spese di carburante dell'auto.
 Inserisci i chilometri percorsi, il consumo in km/l e il prezzo al litro: il
-resto lo calcola l'app.
+resto — litri, spesa, statistiche, andamento mensile — lo calcola l'app.
 
-Nessun database: i dati stanno in un file JSON. Esistono tre versioni, che
-condividono tutto il codice tranne il punto in cui i dati vengono salvati.
+Nessun database, nessun account, nessuna configurazione: i dati stanno in un
+unico file JSON che puoi leggere, copiare e modificare a mano.
 
-| | Dove stanno i dati | Come si prepara |
+**Demo:** <https://ialias.github.io/ConsumoBenzina/> — dati salvati nel tuo
+browser, nulla lascia il tuo dispositivo.
+
+![Schermata del computer di bordo con statistiche, scala di efficienza e grafico dell'andamento mensile](docs/screenshot/dashboard.jpg)
+
+## Indice
+
+- [Caratteristiche](#caratteristiche)
+- [Tre modi di salvare i dati](#tre-modi-di-salvare-i-dati)
+- [Versione locale](#versione-locale)
+- [Versione per l'hosting, con archivio sul server](#versione-per-lhosting-con-archivio-sul-server)
+- [Versione per l'hosting, senza PHP](#versione-per-lhosting-senza-php)
+- [Esporta e importa](#esporta-e-importa)
+- [Come funziona](#come-funziona)
+- [Inserire più in fretta](#inserire-più-in-fretta)
+- [Il file dei dati](#il-file-dei-dati)
+- [Test](#test)
+- [Struttura del progetto](#struttura-del-progetto)
+- [Licenza](#licenza)
+
+## Caratteristiche
+
+- **Statistiche a colpo d'occhio** — km totali, media km/l ponderata sui
+  chilometri, spesa totale, costo al km, prezzo medio del carburante.
+- **Confronto con il mese scorso** — spesa del mese corrente e variazione
+  percentuale rispetto al precedente.
+- **Grafico dell'andamento mensile** — spesa e consumo medio, ultimi 12 mesi,
+  disegnato in SVG puro: nessuna libreria di grafici.
+- **Filtro per periodo** — tutti i viaggi, un anno o un singolo mese.
+- **Inserimento veloce** — km/l e prezzo al litro proposti automaticamente
+  dall'ultimo viaggio; un pulsante duplica un tragitto abituale con la data di
+  oggi.
+- **Esporta / Importa** — copie di sicurezza e migrazione dell'archivio tra le
+  varianti, stesso formato JSON ovunque.
+- **Funziona ovunque** — un server Node in locale, un hosting con PHP, un
+  hosting puramente statico (GitHub Pages incluso): stesso codice, stesse
+  formule, un solo modulo di calcolo condiviso e testato.
+
+## Tre modi di salvare i dati
+
+Non c'è database: l'archivio è sempre un file JSON. Esistono tre varianti, che
+condividono tutto il codice tranne il punto in cui i dati vengono scritti.
+
+| Variante | Dove stanno i dati | Come si prepara |
 |---|---|---|
 | **Locale** | `data.json` sul tuo PC | `npm start` |
 | **Sul sito, con PHP** | `data.json` sul server, condiviso tra tutti i dispositivi | `npm run build` |
@@ -70,6 +117,9 @@ apre la pagina**. Dal telefono vedresti un archivio diverso da quello del PC, e
 cancellare i dati di navigazione cancella i viaggi. Da usare solo se l'hosting
 non esegue PHP.
 
+È la variante pubblicata automaticamente su GitHub Pages, vedi il workflow in
+`.github/workflows/deploy-pages.yml`.
+
 ## Esporta e importa
 
 I pulsanti in alto a destra funzionano in tutte le versioni. **Esporta** scarica
@@ -107,7 +157,7 @@ form con gli stessi valori e la data di oggi.
 
 ## Il file dei dati
 
-Stesso formato in entrambe le versioni:
+Stesso formato in tutte le varianti:
 
 ```json
 {
@@ -135,10 +185,10 @@ recuperabili.
 npm test
 ```
 
-Coprono formule, statistiche e validazione: `public/calcoli.js` e
-`public/dominio.js`.
+34 test (`node --test`, nessuna dipendenza aggiuntiva) su formule, statistiche
+e validazione: `public/calcoli.js` e `public/dominio.js`.
 
-## Struttura
+## Struttura del progetto
 
 ```
 server.js          API REST e file statici (versione locale)
@@ -163,15 +213,6 @@ test/              test di calcoli.js e dominio.js
 statistiche restano in `calcoli.js`, che gira nella pagina in tutte e tre le
 versioni.
 
-## Demo su GitHub Pages
-
-**<https://ialias.github.io/ConsumoBenzina/>**
-
-Il branch `main` viene pubblicato automaticamente su GitHub Pages a ogni push
-(workflow in `.github/workflows/deploy-pages.yml`), nella variante senza PHP:
-i dati restano nel browser di chi apre la pagina (vedi sopra "Versione per
-l'hosting, senza PHP").
-
 ## Licenza
 
-[MIT](LICENSE).
+Distribuito con licenza [MIT](LICENSE).
