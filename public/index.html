@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Consumo Benzina</title>
+    <link rel="stylesheet" href="stile.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛽</text></svg>"
+    />
+  </head>
+  <body>
+    <div class="pagina">
+      <header class="intestazione">
+        <h1>
+          <svg class="logo" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M3 21h12M7 8h4"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+            <path
+              d="M14 9h3a2 2 0 0 1 2 2v6a1.5 1.5 0 0 0 3 0V9l-2.5-2.5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+          </svg>
+          Consumo<span>Benzina</span>
+        </h1>
+
+        <div class="strumenti">
+          <p class="sottotitolo" id="riepilogo-archivio">Archivio</p>
+          <div class="pulsanti-archivio">
+            <button type="button" class="pulsante pulsante--minuto" id="esporta">
+              Esporta
+            </button>
+            <button type="button" class="pulsante pulsante--minuto" id="importa">
+              Importa
+            </button>
+            <input
+              type="file"
+              id="file-importa"
+              accept=".json,application/json"
+              hidden
+            />
+          </div>
+        </div>
+      </header>
+
+      <div class="avviso" id="avviso" role="alert" hidden></div>
+
+      <!-- Statistiche -->
+      <section class="cruscotto" aria-label="Statistiche">
+        <div class="pannello pannello--principale">
+          <h2 class="etichetta-pannello">Computer di bordo</h2>
+
+          <div class="valori-principali">
+            <div class="valore">
+              <span class="valore__numero" id="km-totali">—</span>
+              <span class="valore__unita">km percorsi</span>
+            </div>
+            <div class="valore">
+              <span class="valore__numero valore__numero--accento" id="media-kml">—</span>
+              <span class="valore__unita">km/l medi</span>
+            </div>
+            <div class="valore">
+              <span class="valore__numero" id="spesa-totale">—</span>
+              <span class="valore__unita">euro spesi</span>
+            </div>
+            <div class="valore">
+              <span class="valore__numero" id="numero-viaggi">—</span>
+              <span class="valore__unita">viaggi</span>
+            </div>
+          </div>
+
+          <!-- Scala graduata: dove sta la media rispetto al proprio storico -->
+          <figure class="scala" id="scala" hidden>
+            <figcaption class="scala__titolo">
+              Media rispetto ai tuoi viaggi
+            </figcaption>
+            <div class="scala__pista">
+              <div class="scala__tacche" aria-hidden="true"></div>
+              <div class="scala__indice" id="scala-indice"></div>
+            </div>
+            <div class="scala__estremi">
+              <span id="scala-min">—</span>
+              <span id="scala-max">—</span>
+            </div>
+          </figure>
+
+          <dl class="dettagli">
+            <div><dt>Costo al km</dt><dd id="costo-km">—</dd></div>
+            <div><dt>Spesa media</dt><dd id="spesa-media">—</dd></div>
+            <div><dt>Litri totali</dt><dd id="litri-totali">—</dd></div>
+            <div><dt>Prezzo medio</dt><dd id="prezzo-medio">—</dd></div>
+          </dl>
+        </div>
+
+        <div class="colonna-laterale">
+          <div class="pannello pannello--mese">
+            <h2 class="etichetta-pannello" id="titolo-mese">Mese corrente</h2>
+            <p class="mese__spesa" id="mese-spesa">—</p>
+            <p class="mese__km" id="mese-km">nessun viaggio questo mese</p>
+            <p class="variazione" id="mese-variazione" hidden></p>
+          </div>
+
+          <div class="pannello pannello--grafico" id="pannello-grafico" hidden>
+            <h2 class="etichetta-pannello">Andamento mensile</h2>
+            <div class="grafico" id="grafico"></div>
+            <p class="legenda">
+              <span class="legenda__voce legenda__voce--barra">spesa</span>
+              <span class="legenda__voce legenda__voce--linea">km/l</span>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Inserimento -->
+      <section class="pannello pannello--form">
+        <h2 class="etichetta-pannello" id="titolo-form">Nuovo viaggio</h2>
+
+        <form id="form-viaggio" novalidate>
+          <div class="campi">
+            <label class="campo campo--data">
+              <span>Data</span>
+              <input type="date" name="data" id="campo-data" required />
+            </label>
+            <label class="campo campo--descrizione">
+              <span>Descrizione</span>
+              <input
+                type="text"
+                name="descrizione"
+                id="campo-descrizione"
+                maxlength="200"
+                placeholder="Roma - Napoli"
+              />
+            </label>
+            <label class="campo">
+              <span>Km</span>
+              <input
+                type="number"
+                name="km"
+                id="campo-km"
+                step="0.1"
+                min="0.1"
+                inputmode="decimal"
+                placeholder="225"
+                required
+              />
+            </label>
+            <label class="campo">
+              <span>Km/l</span>
+              <input
+                type="number"
+                name="kmPerLitro"
+                id="campo-kml"
+                step="0.1"
+                min="0.1"
+                inputmode="decimal"
+                placeholder="16,4"
+                required
+              />
+            </label>
+            <label class="campo">
+              <span>€/litro</span>
+              <input
+                type="number"
+                name="prezzoLitro"
+                id="campo-prezzo"
+                step="0.001"
+                min="0.001"
+                inputmode="decimal"
+                placeholder="1,789"
+                required
+              />
+            </label>
+          </div>
+
+          <div class="azioni-form">
+            <p class="anteprima" id="anteprima">Compila i campi per vedere il calcolo</p>
+            <div class="pulsanti">
+              <button type="button" class="pulsante pulsante--fantasma" id="annulla" hidden>
+                Annulla
+              </button>
+              <button type="submit" class="pulsante pulsante--primario" id="invia">
+                Aggiungi viaggio
+              </button>
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <!-- Elenco -->
+      <section class="pannello pannello--elenco">
+        <div class="testata-elenco">
+          <h2 class="etichetta-pannello">Viaggi</h2>
+          <label class="filtro">
+            <span>Periodo</span>
+            <select id="filtro-periodo">
+              <option value="tutti">Tutti</option>
+            </select>
+          </label>
+        </div>
+
+        <table class="tabella" id="tabella">
+          <thead>
+            <tr>
+              <th scope="col">Data</th>
+              <th scope="col">Descrizione</th>
+              <th scope="col" class="numerico">Km</th>
+              <th scope="col" class="numerico">Km/l</th>
+              <th scope="col" class="numerico">Litri</th>
+              <th scope="col" class="numerico">Spesa</th>
+              <th scope="col"><span class="solo-lettori">Azioni</span></th>
+            </tr>
+          </thead>
+          <tbody id="corpo-tabella"></tbody>
+        </table>
+
+        <p class="vuoto" id="elenco-vuoto" hidden>
+          Nessun viaggio registrato. Aggiungi il primo qui sopra.
+        </p>
+      </section>
+    </div>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

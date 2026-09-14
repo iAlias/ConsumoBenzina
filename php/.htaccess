@@ -1,0 +1,10 @@
+# L'archivio si legge e si scrive solo attraverso api.php: senza questa regola
+# chiunque potrebbe scaricare data.json digitandone l'indirizzo.
+<Files "data.json">
+    Require all denied
+</Files>
+
+# Vale anche per il temporaneo lasciato da una scrittura interrotta.
+<Files "data.json.tmp">
+    Require all denied
+</Files>

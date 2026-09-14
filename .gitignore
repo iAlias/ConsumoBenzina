@@ -1,0 +1,13 @@
+# Dipendenze
+node_modules/
+
+# Cartella generata da build.js — si ricrea con `npm run build`
+dist/
+
+# Archivio dati locale: stato personale, non codice
+data.json
+data.json.tmp
+
+# File temporanei di editor/OS
+.DS_Store
+Thumbs.db

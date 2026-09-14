@@ -1,0 +1,983 @@
+/* ------------------------------------------------------------------
+   Consumo Benzina — quadro strumenti
+   Numeri in monospace con cifre tabulari, etichette serigrafate in
+   maiuscoletto spaziato, accento ambra riservato ai dati che contano.
+   ------------------------------------------------------------------ */
+
+:root {
+  --fondo: #12141a;
+  --superficie: #181b23;
+  --superficie-alta: #1e222c;
+  --linea: #262b36;
+  --testo: #e8eaf0;
+  --testo-tenue: #8b93a7;
+  --ambra: #f5a524;
+  --ambra-tenue: rgba(245, 165, 36, 0.14);
+  --verde: #3ecf8e;
+  --rosso: #f2555a;
+
+  --mono: ui-monospace, "Cascadia Mono", "Consolas", "SF Mono", "Menlo", monospace;
+  --testo-font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+  --raggio: 10px;
+  --spazio: 1.25rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Le regole `display` più avanti in questo foglio batterebbero il display:none
+   dell'attributo hidden, lasciando in pagina elementi vuoti. */
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  padding: clamp(1rem, 3vw, 2.5rem) 1rem 4rem;
+  background: var(--fondo);
+  color: var(--testo);
+  font-family: var(--testo-font);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.pagina {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: grid;
+  /* minmax(0, 1fr) e non 1fr: senza il minimo a zero, una griglia non scende
+     mai sotto il contenuto minimo dei suoi figli, e basta un titolo che non va
+     a capo per spingere l'intera pagina fuori dallo schermo. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--spazio);
+}
+
+.solo-lettori {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --- Intestazione --- */
+
+.intestazione {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--linea);
+}
+
+.intestazione h1 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.logo {
+  width: 1.35rem;
+  height: 1.35rem;
+  color: var(--ambra);
+  flex: none;
+}
+
+.intestazione h1 span {
+  color: var(--ambra);
+}
+
+.intestazione h1 span::before {
+  content: " ";
+}
+
+.sottotitolo {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--testo-tenue);
+}
+
+.strumenti {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.pulsanti-archivio {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+/* --- Avvisi --- */
+
+.avviso {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 1rem;
+  border: 1px solid;
+  border-left-width: 3px;
+  border-radius: var(--raggio);
+  font-size: 0.9rem;
+}
+
+.avviso__testo {
+  margin: 0;
+}
+
+.avviso__azioni {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.avviso--errore {
+  border-color: var(--rosso);
+  background: rgba(242, 85, 90, 0.1);
+  color: #ffd2d4;
+}
+
+.avviso--domanda {
+  border-color: var(--ambra);
+  background: var(--ambra-tenue);
+  color: #ffe0b0;
+}
+
+.avviso--conferma {
+  border-color: var(--verde);
+  background: rgba(62, 207, 142, 0.1);
+  color: #b6f0d4;
+}
+
+/* --- Pannelli --- */
+
+.pannello {
+  padding: var(--spazio);
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: var(--raggio);
+}
+
+.etichetta-pannello {
+  margin: 0 0 1rem;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--testo-tenue);
+}
+
+.cruscotto {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  gap: var(--spazio);
+  align-items: start;
+}
+
+.colonna-laterale {
+  display: grid;
+  gap: var(--spazio);
+}
+
+/* --- Valori principali --- */
+
+.valori-principali {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+.valore {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.valore__numero {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(1.55rem, 4vw, 2.15rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.valore__numero--accento {
+  color: var(--ambra);
+}
+
+.valore__unita {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--testo-tenue);
+}
+
+/* --- Scala graduata del consumo (elemento firma) --- */
+
+.scala {
+  margin: 1.75rem 0 1.5rem;
+}
+
+.scala__titolo {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--testo-tenue);
+  margin-bottom: 0.5rem;
+}
+
+.scala__pista {
+  position: relative;
+  height: 26px;
+  /* Il pallino dell'indice sporge di 4px per lato: senza questo margine
+     uscirebbe dal pannello quando la media è a un estremo della scala. */
+  margin: 0 5px;
+  border-bottom: 1px solid var(--linea);
+}
+
+.scala__tacche {
+  position: absolute;
+  inset: auto 0 0;
+  height: 100%;
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--linea) 0 1px,
+    transparent 1px 5%
+  );
+  background-position: bottom;
+  background-repeat: no-repeat;
+  background-size: 100% 45%;
+}
+
+.scala__indice {
+  position: absolute;
+  bottom: 0;
+  width: 2px;
+  height: 100%;
+  background: var(--ambra);
+  transform: translateX(-1px);
+  transition: left 0.35s ease;
+}
+
+.scala__indice::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  background: var(--ambra);
+  border-radius: 50%;
+  transform: translateX(-50%);
+}
+
+.scala__estremi {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.35rem;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--testo-tenue);
+}
+
+/* --- Dettagli --- */
+
+.dettagli {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.85rem 1rem;
+  margin: 0;
+  padding-top: 1.15rem;
+  border-top: 1px solid var(--linea);
+}
+
+.dettagli dt {
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--testo-tenue);
+}
+
+.dettagli dd {
+  margin: 0.15rem 0 0;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 1rem;
+}
+
+/* --- Mese corrente --- */
+
+.mese__spesa {
+  margin: 0;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(1.7rem, 5vw, 2.3rem);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.mese__km {
+  margin: 0.4rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--testo-tenue);
+}
+
+.variazione {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0.9rem 0 0;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: var(--superficie-alta);
+  font-family: var(--mono);
+  font-size: 0.74rem;
+}
+
+.variazione--calo {
+  color: var(--verde);
+}
+
+.variazione--aumento {
+  color: var(--ambra);
+}
+
+/* --- Grafico --- */
+
+.grafico svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.grafico .barra {
+  fill: var(--ambra-tenue);
+  stroke: rgba(245, 165, 36, 0.45);
+  stroke-width: 1;
+}
+
+.grafico .linea {
+  fill: none;
+  stroke: var(--testo);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.grafico .punto {
+  fill: var(--fondo);
+  stroke: var(--testo);
+  stroke-width: 1.5;
+}
+
+.grafico .etichetta-mese {
+  fill: var(--testo-tenue);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+.legenda {
+  display: flex;
+  gap: 1rem;
+  margin: 0.75rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--testo-tenue);
+}
+
+.legenda__voce {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.legenda__voce::before {
+  content: "";
+  width: 12px;
+  height: 8px;
+}
+
+.legenda__voce--barra::before {
+  background: var(--ambra-tenue);
+  border: 1px solid rgba(245, 165, 36, 0.45);
+}
+
+.legenda__voce--linea::before {
+  height: 2px;
+  background: var(--testo);
+}
+
+/* --- Form --- */
+
+.campi {
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr) repeat(3, 7rem);
+  gap: 0.85rem;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.campo > span {
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--testo-tenue);
+}
+
+input,
+select {
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  background: var(--fondo);
+  color: var(--testo);
+  border: 1px solid var(--linea);
+  border-radius: 7px;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.95rem;
+}
+
+input::placeholder {
+  color: #4d5566;
+}
+
+/* Valore proposto dall'ultimo viaggio: si distingue da quello digitato, così
+   resta chiaro che è da confermare e non un dato già inserito. */
+.campo--suggerito {
+  border-style: dashed;
+  border-color: #454d61;
+  color: #a7afc2;
+}
+
+.campo--suggerito:focus-visible {
+  color: var(--testo);
+}
+
+input:focus-visible,
+select:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--ambra);
+  outline-offset: 2px;
+}
+
+input:hover,
+select:hover {
+  border-color: #3a4152;
+}
+
+/* Il selettore data del browser è chiaro su fondo scuro: lo scurisco. */
+input[type="date"] {
+  color-scheme: dark;
+}
+
+.azioni-form {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1.15rem;
+}
+
+.anteprima {
+  margin: 0;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.85rem;
+  color: var(--testo-tenue);
+}
+
+.anteprima--attiva {
+  color: var(--ambra);
+}
+
+.pulsanti {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.pulsante {
+  padding: 0.6rem 1.15rem;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.pulsante--primario {
+  background: var(--ambra);
+  color: #17140c;
+}
+
+.pulsante--primario:hover {
+  background: #ffb944;
+}
+
+.pulsante--primario:disabled {
+  background: var(--linea);
+  color: var(--testo-tenue);
+  cursor: progress;
+}
+
+.pulsante--minuto {
+  padding: 0.4rem 0.7rem;
+  background: transparent;
+  border-color: var(--linea);
+  color: var(--testo-tenue);
+  font-size: 0.68rem;
+}
+
+.pulsante--minuto:hover {
+  border-color: var(--testo-tenue);
+  color: var(--testo);
+}
+
+/* Ha entrambe le classi: senza questo, il fondo trasparente di --minuto
+   cancellerebbe l'ambra di --primario. */
+.pulsante--minuto.pulsante--primario,
+.pulsante--minuto.pulsante--primario:hover {
+  background: var(--ambra);
+  border-color: var(--ambra);
+  color: #17140c;
+}
+
+.pulsante--minuto.pulsante--primario:hover {
+  background: #ffb944;
+}
+
+.pulsante--fantasma {
+  background: transparent;
+  border-color: var(--linea);
+  color: var(--testo-tenue);
+}
+
+.pulsante--fantasma:hover {
+  border-color: var(--testo-tenue);
+  color: var(--testo);
+}
+
+/* --- Elenco --- */
+
+.testata-elenco {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.testata-elenco .etichetta-pannello {
+  margin: 0;
+}
+
+.filtro {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.filtro > span {
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--testo-tenue);
+}
+
+.filtro select {
+  width: auto;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.82rem;
+}
+
+.tabella {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.87rem;
+}
+
+.tabella th {
+  padding: 0 0.7rem 0.6rem;
+  border-bottom: 1px solid var(--linea);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--testo-tenue);
+  text-align: left;
+}
+
+.tabella th.numerico,
+.tabella td.numerico {
+  text-align: right;
+}
+
+.tabella td {
+  padding: 0.7rem;
+  border-bottom: 1px solid rgba(38, 43, 54, 0.6);
+}
+
+.tabella tbody tr:hover td {
+  background: var(--superficie-alta);
+}
+
+.tabella tbody tr.in-modifica td {
+  background: var(--ambra-tenue);
+}
+
+.cella-data {
+  color: var(--testo-tenue);
+  white-space: nowrap;
+}
+
+.cella-descrizione {
+  font-family: var(--testo-font);
+  max-width: 22ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cella-descrizione:empty::before {
+  content: "—";
+  color: var(--testo-tenue);
+}
+
+.cella-spesa {
+  color: var(--ambra);
+  font-weight: 600;
+}
+
+.cella-azioni {
+  width: 1%;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.icona {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.45rem;
+  margin-left: 0.15rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--testo-tenue);
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.icona svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+}
+
+/* La conferma di eliminazione mostra anche la parola, non solo il simbolo. */
+.icona--conferma {
+  color: var(--rosso);
+  border-color: var(--rosso);
+}
+
+.icona:hover {
+  color: var(--testo);
+  border-color: var(--linea);
+}
+
+.icona--elimina:hover {
+  color: var(--rosso);
+  border-color: var(--rosso);
+}
+
+.vuoto {
+  margin: 1.5rem 0 0.5rem;
+  text-align: center;
+  color: var(--testo-tenue);
+  font-size: 0.9rem;
+}
+
+/* ------------------------------------------------------------------
+   Schermi stretti
+   ------------------------------------------------------------------ */
+
+@media (max-width: 960px) {
+  .cruscotto {
+    grid-template-columns: 1fr;
+  }
+
+  .campi {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .campo--data,
+  .campo--descrizione {
+    grid-column: span 3;
+  }
+}
+
+@media (max-width: 700px) {
+  :root {
+    --spazio: 1rem;
+  }
+
+  body {
+    padding: 1rem 0.75rem 3rem;
+  }
+
+  .intestazione {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+  }
+
+  /* Su touch il valore va letto, non centellinato: due colonne ampie. */
+  .valori-principali {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.15rem 1rem;
+  }
+
+  .dettagli {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Niente zoom automatico del browser sul campo a fuoco: serve almeno 16px. */
+  input,
+  select {
+    font-size: 16px;
+    padding: 0.7rem;
+  }
+
+  .azioni-form {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.85rem;
+  }
+
+  .pulsante {
+    flex: 1;
+    padding: 0.85rem 1rem;
+  }
+
+  .anteprima {
+    text-align: center;
+  }
+
+  .testata-elenco {
+    align-items: flex-start;
+  }
+
+  .filtro {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .filtro select {
+    flex: 1;
+    max-width: 60%;
+  }
+
+  /* --- La tabella diventa una scheda per viaggio ---
+     Riga 1: descrizione e spesa, i due dati che si cercano per primi.
+     Riga 2: data, km, consumo, litri e le azioni, in tono minore. */
+  .tabella thead {
+    display: none;
+  }
+
+  .tabella,
+  .tabella tbody {
+    display: block;
+  }
+
+  /* Metriche e pulsanti sulla stessa riga non ci stanno a nessuna larghezza
+     da telefono: i pulsanti scendono e le metriche occupano tutto. */
+  .tabella tr {
+    display: grid;
+    grid-template-columns: repeat(3, auto) 1fr;
+    align-items: center;
+    gap: 0.3rem 0.6rem;
+    padding: 0.9rem 0;
+    border-bottom: 1px solid var(--linea);
+  }
+
+  .tabella tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .tabella td {
+    padding: 0;
+    border: none;
+  }
+
+  .tabella td.numerico {
+    text-align: left;
+  }
+
+  /* Ogni cella ha una posizione esplicita: l'ordine delle colonne della
+     tabella non coincide con quello della scheda. */
+  .cella-descrizione {
+    grid-area: 1 / 1 / 2 / 4;
+    max-width: none;
+    white-space: normal;
+    font-size: 0.95rem;
+    line-height: 1.3;
+  }
+
+  .cella-spesa {
+    grid-area: 1 / 4 / 2 / 5;
+    justify-self: end;
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+
+  .cella-data {
+    grid-area: 2 / 1;
+  }
+
+  .cella-km {
+    grid-area: 2 / 2;
+  }
+
+  .cella-consumo {
+    grid-area: 2 / 3;
+  }
+
+  .cella-litri {
+    grid-area: 2 / 4;
+  }
+
+  .cella-data,
+  .cella-km,
+  .cella-consumo,
+  .cella-litri {
+    font-size: 0.78rem;
+    color: var(--testo-tenue);
+    white-space: nowrap;
+  }
+
+  /* Senza intestazioni di colonna il numero da solo non si spiega. */
+  .cella-consumo::after {
+    content: " km/l";
+  }
+
+  .cella-azioni {
+    grid-area: 3 / 1 / 4 / 5;
+    justify-self: end;
+    width: auto;
+    margin-top: 0.2rem;
+  }
+
+  /* Aree toccabili da dito, non da mouse. */
+  .icona {
+    padding: 0.55rem;
+    margin-left: 0.25rem;
+    border-color: var(--linea);
+  }
+
+  .icona svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .tabella tbody tr:hover td {
+    background: transparent;
+  }
+}
+
+@media (max-width: 420px) {
+  .valore__numero {
+    font-size: 1.5rem;
+  }
+
+  .campi {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .campo--data,
+  .campo--descrizione {
+    grid-column: span 2;
+  }
+
+  /* Il prezzo al litro passa a tutta larghezza invece di stringersi. */
+  .campi .campo:last-child {
+    grid-column: span 2;
+  }
+
+  .tabella tr {
+    gap: 0.3rem 0.5rem;
+  }
+
+  .cella-data,
+  .cella-km,
+  .cella-consumo,
+  .cella-litri {
+    font-size: 0.72rem;
+  }
+}
+
+/* Sotto la larghezza di qualsiasi telefono in commercio: le metriche possono
+   andare a capo, brutte ma dentro lo schermo. */
+@media (max-width: 340px) {
+  .cella-data,
+  .cella-km,
+  .cella-consumo,
+  .cella-litri {
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

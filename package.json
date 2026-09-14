@@ -1,0 +1,14 @@
+{
+  "name": "consumo-benzina",
+  "version": "1.0.0",
+  "description": "Monitoraggio dei consumi e delle spese di carburante dell'auto",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "build": "node build.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
